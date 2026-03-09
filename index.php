@@ -330,7 +330,7 @@ $vendorOk = file_exists(__DIR__ . '/vendor/autoload.php');
                                 <?php if ($logoImage !== ''): ?>
                                 <div class="mb-4 text-center">
                                     <p class="small text-muted mb-2">Logo actual:</p>
-                                    <img src="<?= $appBase ?>/uploads/<?= htmlspecialchars($logoImage) ?>"
+                                    <img src="/uploads/<?= htmlspecialchars($logoImage) ?>"
                                          alt="Logo actual"
                                          class="img-thumbnail"
                                          style="max-height: 100px; max-width: 280px;">

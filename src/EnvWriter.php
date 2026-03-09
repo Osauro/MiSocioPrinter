@@ -41,7 +41,7 @@ class EnvWriter
             // Reemplaza la linea existente si la clave ya esta
             $pattern = '/^(' . preg_quote($key, '/') . '\s*=).*$/m';
             if (preg_match($pattern, $content)) {
-                $content = preg_replace($pattern, "$1{$escapedValue}", $content);
+                $content = preg_replace($pattern, '$1' . $escapedValue, $content);
             } else {
                 // Agregar al final
                 $content = rtrim($content) . "\n{$key}={$escapedValue}\n";

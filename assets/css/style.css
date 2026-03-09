@@ -1,0 +1,140 @@
+/* ============================================================
+   MiSocio Printer - Estilos personalizados
+   ============================================================ */
+
+body {
+    background-color: #f0f2f5;
+    font-size: 0.9rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #12263a !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,.35);
+}
+.navbar-brand {
+    font-size: 1rem;
+    letter-spacing: .3px;
+}
+
+/* Card principal */
+.card {
+    border: none;
+    border-radius: .6rem;
+    box-shadow: 0 2px 16px rgba(0,0,0,.08);
+}
+.card-header {
+    border-radius: .6rem .6rem 0 0 !important;
+    padding: .85rem 1.25rem;
+}
+.card-header h5 {
+    font-size: 1rem;
+}
+.card-footer {
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    border-radius: 0 0 .6rem .6rem;
+    padding: .85rem 1.25rem;
+}
+
+/* Etiquetas de secciones */
+.section-label {
+    font-weight: 600;
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    margin-bottom: .65rem;
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+}
+
+/* Labels de formulario */
+.form-label {
+    font-weight: 500;
+    font-size: .82rem;
+    color: #495057;
+    margin-bottom: .3rem;
+}
+
+/* Inputs */
+.form-control,
+.form-select {
+    font-size: .875rem;
+    border-color: #ced4da;
+}
+.form-control:focus,
+.form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 .2rem rgba(13,110,253,.15);
+}
+
+/* Indicador de estado de conexion */
+.status-dot {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    margin-right: 7px;
+    vertical-align: middle;
+    box-shadow: 0 0 0 2px rgba(0,0,0,.08);
+}
+.status-connected    { background-color: #28a745; }
+.status-disconnected { background-color: #dc3545; }
+.status-unknown      { background-color: #ffc107; }
+
+#connectionText {
+    font-size: .875rem;
+    vertical-align: middle;
+}
+
+/* Tabs */
+.nav-tabs .nav-link {
+    color: #6c757d;
+    font-size: .855rem;
+    padding: .45rem .9rem;
+}
+.nav-tabs .nav-link.active {
+    font-weight: 600;
+    color: #0d6efd;
+}
+
+/* Botones */
+.btn { font-size: .855rem; }
+
+/* Alertas */
+#alertContainer .alert {
+    font-size: .875rem;
+    border-radius: .45rem;
+}
+
+/* Preview del logo */
+#logoPreview {
+    background: #f8f9fa;
+}
+
+/* Separadores internos */
+.tab-pane hr {
+    border-color: #dee2e6;
+    margin: 1rem 0;
+}
+
+/* Checkboxes */
+.form-check-label {
+    font-size: .875rem;
+    cursor: pointer;
+}
+.form-check-input {
+    cursor: pointer;
+}
+
+/* Texto ayuda pequeño */
+.form-text {
+    font-size: .78rem;
+}
+
+/* Seccion de pruebas */
+.tests-section .btn {
+    min-width: 155px;
+}

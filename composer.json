@@ -1,0 +1,17 @@
+{
+    "name": "misocio/printer",
+    "description": "Sistema de impresion de tickets para MiSocio POS",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "mike42/escpos-php": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "MiSocio\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}

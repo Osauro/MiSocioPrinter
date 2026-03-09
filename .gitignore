@@ -1,0 +1,21 @@
+# Dependencias
+/vendor/
+
+# Configuracion con credenciales reales
+.env
+
+# Uploads (logos subidos por el usuario)
+/uploads/*
+!/uploads/.gitkeep
+
+# Archivos de debug/test temporales
+_*.php
+_*.txt
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/

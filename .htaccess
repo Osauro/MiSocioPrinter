@@ -1,0 +1,24 @@
+Options -Indexes
+
+# Seguridad: bloquear acceso directo a archivos sensibles
+<FilesMatch "^\.env">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "(composer\.(json|lock)|\.gitkeep)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # No redirigir archivos o directorios que existen fisicamente
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # /{tipo}/{id}  →  print.php?tipo={tipo}&id={id}
+    RewriteRule ^(venta|prestamo)/([1-9][0-9]*)/?$ print.php?tipo=$1&id=$2 [L,QSA]
+</IfModule>

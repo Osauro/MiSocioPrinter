@@ -58,39 +58,13 @@ abstract class BaseTicket
 
         // Logo imagen
         if ($this->config['show_logo'] && $this->config['logo_image'] !== '') {
-            $logoPath = ROOT_PATH . '/' . basename($this->config['logo_image']);
-            if (file_exists($logoPath)) {
-                try {
-                    $processedPath = $this->prepareLogoForPrinting($logoPath);
-                    if ($processedPath && file_exists($processedPath)) {
-                        // Cargar imagen SIN optimizaciones para forzar la carga completa
-                        $image = EscposImage::load($processedPath, false);
-                        
-                        // Forzar la carga de datos llamando a toRasterFormat()
-                        $image->toRasterFormat();
-                        
-                        // Ahora verificar que la imagen tenga dimensiones válidas
-                        if ($image->getWidth() > 0 && $image->getHeight() > 0) {
-                            try {
-                                $this->printer->bitImage($image);
-                            } catch (\Exception $e2) {
-                                try {
-                                    $this->printer->graphics($image);
-                                } catch (\Exception $e3) {
-                                    error_log("Error imprimiendo imagen: " . $e3->getMessage());
-                                }
-                            }
-                            $this->printer->feed(1);
-                            $logoImpreso = true;
-                        } else {
-                            error_log("Logo cargado con dimensiones inválidas: " . $image->getWidth() . "x" . $image->getHeight());
-                        }
-                    }
-                } catch (\Exception $e) {
-                    // Log del error para debugging
-                    error_log("Error cargando logo: " . $e->getMessage());
-                    // Continuar sin imagen si falla la carga
-                }
+            try {
+                $logo = EscposImage::load("logo.png", false);
+                $this->printer->bitImage($logo);
+                $this->printer->feed(1);
+                $logoImpreso = true;
+            } catch (\Exception $e) {
+                error_log("Error cargando logo: " . $e->getMessage());
             }
         }
 

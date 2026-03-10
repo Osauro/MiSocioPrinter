@@ -61,7 +61,7 @@
     echo "<ul>";
     echo "<li>Relativa: <a href='logo.png' target='_blank'>logo.png</a></li>";
     echo "<li>Absoluta: <a href='/logo.png' target='_blank'>/logo.png</a></li>";
-    echo "<li>Con puerto: <a href='http://localhost:1013/logo.png' target='_blank'>http://localhost:1013/logo.png</a></li>";
+    echo "<li>Con puerto: <a href='http://localhost:5421/logo.png' target='_blank'>http://localhost:5421/logo.png</a></li>";
     echo "</ul>";
     echo "</div>";
     ?>

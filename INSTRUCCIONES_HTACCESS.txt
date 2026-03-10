@@ -27,7 +27,7 @@ todos los archivos .htaccess del proyecto.
 
 ## VERIFICACIÓN:
 Después del cambio, accede a:
-http://localhost:1013/uploads/logo.png
+http://localhost:5421/uploads/logo.png
 
 Debería mostrarse la imagen correctamente.
 

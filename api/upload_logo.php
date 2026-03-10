@@ -57,15 +57,13 @@ if ($file['size'] > $maxSize) {
     exit;
 }
 
-$uploadDir = UPLOADS_PATH . '/';
-if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true)) {
-    echo json_encode(['success' => false, 'message' => 'No se pudo crear el directorio de uploads.']);
-    exit;
-}
+$uploadDir = ROOT_PATH . '/';
 
-// Eliminar logos anteriores
+// Eliminar logos anteriores en la raíz
 foreach (glob($uploadDir . 'logo.*') as $oldFile) {
-    unlink($oldFile);
+    if (basename($oldFile) !== '.htaccess') {
+        unlink($oldFile);
+    }
 }
 
 $ext         = $allowed[$mimeType];

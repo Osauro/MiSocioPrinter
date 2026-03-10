@@ -58,7 +58,7 @@ abstract class BaseTicket
 
         // Logo imagen
         if ($this->config['show_logo'] && $this->config['logo_image'] !== '') {
-            $logoPath = UPLOADS_PATH . '/' . basename($this->config['logo_image']);
+            $logoPath = ROOT_PATH . '/' . basename($this->config['logo_image']);
             if (file_exists($logoPath)) {
                 try {
                     $processedPath = $this->prepareLogoForPrinting($logoPath);

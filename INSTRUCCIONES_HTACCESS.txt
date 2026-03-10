@@ -1,0 +1,35 @@
+# ============================================
+# INSTRUCCIONES PARA HABILITAR .htaccess
+# ============================================
+
+## PROBLEMA DETECTADO:
+Apache tiene "AllowOverride None" en httpd.conf, lo que hace que ignore
+todos los archivos .htaccess del proyecto.
+
+## SOLUCIÓN:
+
+1. Abre el menú de Laragon (clic derecho en el icono de la bandeja)
+2. Ve a: Apache > httpd.conf
+3. Busca la sección (línea ~272):
+
+    <Directory "C:/laragon/www">
+        ...
+        AllowOverride None
+        ...
+    </Directory>
+
+4. Cambia "None" por "All":
+
+    AllowOverride All
+
+5. Guarda el archivo
+6. Reinicia Apache desde Laragon: Apache > Reload
+
+## VERIFICACIÓN:
+Después del cambio, accede a:
+http://localhost:1013/uploads/logo.png
+
+Debería mostrarse la imagen correctamente.
+
+## ALTERNATIVA (Sin modificar httpd.conf):
+Crear un virtual host específico para este proyecto con AllowOverride All.

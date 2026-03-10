@@ -67,11 +67,74 @@ foreach (glob($uploadDir . 'logo.*') as $oldFile) {
 }
 
 $ext         = $allowed[$mimeType];
-$newFilename = 'logo.' . $ext;
-$destination = $uploadDir . $newFilename;
+$tempFilename = 'logo_temp.' . $ext;
+$tempPath = $uploadDir . $tempFilename;
 
-if (!move_uploaded_file($file['tmp_name'], $destination)) {
+if (!move_uploaded_file($file['tmp_name'], $tempPath)) {
     echo json_encode(['success' => false, 'message' => 'No se pudo guardar el archivo.']);
+    exit;
+}
+
+// Redimensionar a 256x256
+try {
+    // Cargar imagen según tipo
+    switch ($mimeType) {
+        case 'image/png':
+            $src = imagecreatefrompng($tempPath);
+            break;
+        case 'image/gif':
+            $src = imagecreatefromgif($tempPath);
+            break;
+        case 'image/bmp':
+        case 'image/x-ms-bmp':
+            $src = imagecreatefrombmp($tempPath);
+            break;
+        default:
+            throw new Exception('Tipo de imagen no soportado para redimensionar');
+    }
+    
+    if (!$src) {
+        unlink($tempPath);
+        echo json_encode(['success' => false, 'message' => 'No se pudo procesar la imagen.']);
+        exit;
+    }
+    
+    // Crear imagen de 256x256 con fondo blanco
+    $dst = imagecreatetruecolor(256, 256);
+    $white = imagecolorallocate($dst, 255, 255, 255);
+    imagefilledrectangle($dst, 0, 0, 255, 255, $white);
+    
+    // Redimensionar manteniendo proporción y centrando
+    $origW = imagesx($src);
+    $origH = imagesy($src);
+    
+    $scale = min(256 / $origW, 256 / $origH);
+    $newW = (int)($origW * $scale);
+    $newH = (int)($origH * $scale);
+    
+    $offsetX = (int)((256 - $newW) / 2);
+    $offsetY = (int)((256 - $newH) / 2);
+    
+    imagecopyresampled($dst, $src, $offsetX, $offsetY, 0, 0, $newW, $newH, $origW, $origH);
+    imagedestroy($src);
+    
+    // Guardar como PNG
+    $finalPath = $uploadDir . 'logo.png';
+    imagepng($dst, $finalPath, 9);
+    imagedestroy($dst);
+    
+    // Eliminar archivo temporal
+    if (file_exists($tempPath)) {
+        unlink($tempPath);
+    }
+    
+    $newFilename = 'logo.png';
+    
+} catch (Exception $e) {
+    if (file_exists($tempPath)) {
+        unlink($tempPath);
+    }
+    echo json_encode(['success' => false, 'message' => 'Error al procesar la imagen: ' . $e->getMessage()]);
     exit;
 }
 

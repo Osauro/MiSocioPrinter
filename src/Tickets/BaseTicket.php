@@ -59,10 +59,15 @@ abstract class BaseTicket
         // Logo imagen
         if ($this->config['show_logo'] && $this->config['logo_image'] !== '') {
             try {
-                $logo = EscposImage::load("logo.png", false);
-                $this->printer->bitImage($logo);
-                $this->printer->feed(1);
-                $logoImpreso = true;
+                $logoPath = ROOT_PATH . '/logo.png';
+                if (file_exists($logoPath)) {
+                    $logo = EscposImage::load($logoPath, false);
+                    $this->printer->bitImage($logo);
+                    $this->printer->feed(1);
+                    $logoImpreso = true;
+                } else {
+                    error_log("Logo no encontrado en: " . $logoPath);
+                }
             } catch (\Exception $e) {
                 error_log("Error cargando logo: " . $e->getMessage());
             }

@@ -61,16 +61,34 @@ abstract class BaseTicket
             $logoPath = UPLOADS_PATH . '/' . basename($this->config['logo_image']);
             if (file_exists($logoPath)) {
                 try {
-                    $logoPath = $this->prepareLogoForPrinting($logoPath);
-                    $image = EscposImage::load($logoPath, false, ['gd', 'native']);
-                    try {
-                        $this->printer->bitImage($image);
-                    } catch (\Exception $e2) {
-                        $this->printer->graphics($image, Printer::IMG_DEFAULT);
+                    $processedPath = $this->prepareLogoForPrinting($logoPath);
+                    if ($processedPath && file_exists($processedPath)) {
+                        // Cargar imagen SIN optimizaciones para forzar la carga completa
+                        $image = EscposImage::load($processedPath, false);
+                        
+                        // Forzar la carga de datos llamando a toRasterFormat()
+                        $image->toRasterFormat();
+                        
+                        // Ahora verificar que la imagen tenga dimensiones válidas
+                        if ($image->getWidth() > 0 && $image->getHeight() > 0) {
+                            try {
+                                $this->printer->bitImage($image);
+                            } catch (\Exception $e2) {
+                                try {
+                                    $this->printer->graphics($image);
+                                } catch (\Exception $e3) {
+                                    error_log("Error imprimiendo imagen: " . $e3->getMessage());
+                                }
+                            }
+                            $this->printer->feed(1);
+                            $logoImpreso = true;
+                        } else {
+                            error_log("Logo cargado con dimensiones inválidas: " . $image->getWidth() . "x" . $image->getHeight());
+                        }
                     }
-                    $this->printer->feed(1);
-                    $logoImpreso = true;
                 } catch (\Exception $e) {
+                    // Log del error para debugging
+                    error_log("Error cargando logo: " . $e->getMessage());
                     // Continuar sin imagen si falla la carga
                 }
             }
@@ -269,31 +287,84 @@ abstract class BaseTicket
      */
     protected function prepareLogoForPrinting(string $srcPath): string
     {
-        // Ancho max en pixels para 80mm a ~203dpi ~ 576px, usamos 300 para no saturar
-        $maxWidth = 300;
+        // Ancho max en pixels - reducido para evitar problemas de memoria en impresoras
+        $maxWidth = 200;
 
-        $src = @imagecreatefrompng($srcPath);
+        // Detectar el tipo de imagen
+        $imageInfo = @getimagesize($srcPath);
+        if (!$imageInfo) {
+            error_log("prepareLogoForPrinting: No se pudo obtener info de imagen: " . $srcPath);
+            return $srcPath;
+        }
+
+        // Crear la imagen source según el tipo
+        $src = null;
+        switch ($imageInfo[2]) {
+            case IMAGETYPE_PNG:
+                $src = @imagecreatefrompng($srcPath);
+                break;
+            case IMAGETYPE_JPEG:
+                $src = @imagecreatefromjpeg($srcPath);
+                break;
+            case IMAGETYPE_GIF:
+                $src = @imagecreatefromgif($srcPath);
+                break;
+            default:
+                error_log("prepareLogoForPrinting: Tipo de imagen no soportado: " . $imageInfo[2]);
+                return $srcPath;
+        }
+
         if (!$src) {
+            error_log("prepareLogoForPrinting: No se pudo crear imagen desde: " . $srcPath);
             return $srcPath; // no se pudo abrir, devolver original
         }
 
         $origW = imagesx($src);
         $origH = imagesy($src);
 
+        // Calcular nuevas dimensiones manteniendo la proporción
         $scale = ($origW > $maxWidth) ? $maxWidth / $origW : 1.0;
         $newW  = max(1, (int)($origW * $scale));
         $newH  = max(1, (int)($origH * $scale));
 
-        $dst   = imagecreatetruecolor($newW, $newH);
+        // Crear imagen destino con fondo blanco
+        $dst = imagecreatetruecolor($newW, $newH);
+        if (!$dst) {
+            imagedestroy($src);
+            error_log("prepareLogoForPrinting: No se pudo crear imagen destino");
+            return $srcPath;
+        }
+
+        // Fondo blanco
         $white = imagecolorallocate($dst, 255, 255, 255);
-        imagefilledrectangle($dst, 0, 0, $newW, $newH, $white);
-        imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+        imagefilledrectangle($dst, 0, 0, $newW - 1, $newH - 1, $white);
+        
+        // Copiar y redimensionar con suavizado
+        imagealphablending($dst, false);
+        imagesavealpha($dst, false);
+        
+        if (!imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH)) {
+            imagedestroy($src);
+            imagedestroy($dst);
+            error_log("prepareLogoForPrinting: Error al redimensionar imagen");
+            return $srcPath;
+        }
+        
         imagedestroy($src);
 
-        $tmpPath = sys_get_temp_dir() . '/misocio_logo_print.png';
-        imagepng($dst, $tmpPath, 0);
+        // Guardar con compresión mínima para mejor calidad
+        $tmpPath = sys_get_temp_dir() . '/misocio_logo_print_' . uniqid() . '.png';
+        
+        // Comprimir la imagen para que sea más pequeña
+        if (!imagepng($dst, $tmpPath, 9)) { // Nivel 9 = máxima compresión
+            imagedestroy($dst);
+            error_log("prepareLogoForPrinting: No se pudo guardar imagen temporal en: " . $tmpPath);
+            return $srcPath;
+        }
+        
         imagedestroy($dst);
 
+        error_log("prepareLogoForPrinting: Imagen procesada: {$newW}x{$newH} -> " . $tmpPath);
         return $tmpPath;
     }
 }
